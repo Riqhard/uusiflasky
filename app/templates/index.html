@@ -3,7 +3,21 @@
 {% block title %}Flasky{% endblock %}
 
 {% block page_content %}
-<div class="page-header">
-    <h1>Hello, {% if current_user.is_authenticated %}{{ current_user.username }}{% else %}Stranger{% endif %}!</h1>
+<div class="logo-section" style="text-align: center; margin: 20px 0;">
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Site Logo" style="max-width: 100%; height: auto;">
+    <h2>Suku Reseptit</h2>
+</div>
+
+<div class="latest-recipes">
+    <h2>Viimeisimmät lisäykset</h2>
+    <ul>
+        {% for recipe in latest_recipes %}
+        <li>
+            <h3><a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}">{{ recipe.title }}</a></h3>
+            <p>{{ recipe.instructions }}</p>
+            <p>{{ recipe.ingredients }}</p>
+        </li>
+        {% endfor %}
+    </ul>
 </div>
 {% endblock %}

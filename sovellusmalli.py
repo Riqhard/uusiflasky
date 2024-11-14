@@ -6,7 +6,14 @@ from app.models import User, Role
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 migrate = Migrate(app, db)
+# Tämä, jos tauluja eikä migraatiotiedostoja ole käytettävissä
 # db.create_all()
+# Tämä, jos Flask-komentorivi ei ole käytössä roolien lisäämiseen
+# with app.app_context():
+    # query = db.session.query(Role).first()
+    # if not query:
+        # print("query: "+str(query))
+        # Role.insert_roles()
 
 @app.shell_context_processor
 def make_shell_context():

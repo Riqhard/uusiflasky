@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% import "auth/wtf.html" as wtf %}
+
+{% block title %}Sovellusmalli - Profiili{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+<h1>Omat tiedot</h1>
+</div>
+<div class="lomake col-md-10 col-lg-8">
+{{ wtf.quick_form(form,novalidate=True,extra_classes='needs-validation') }}
+</div>
+<span class="form-label">Profiilikuva</span>
+<div class="profiili col-md-10 col-lg-8">
+{% if not kuva %}
+<img class="profiilikuva" onclick="alert(this.src)" id="preview" src="{{ url_for('static',filename='default_profile.png') }}">
+{% else %}
+<img class="profiilikuva" onclick="alert(this.src)" id="preview" src="{{ url_for('.img',filename=kuva) }}">
+{% endif %}
+<div class="button-group-vertical">
+<button id="poisto" type="button" class="poisto btn btn-danger" onclick="poista()">Poista kuva</button>
+<button id="palautus" type="button" class="palautus btn btn-info" onclick="palauta()">Palauta kuva</button>
+</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+/*
+Jos profiilikuva on olemassa sitä muutetaan, näytetään poistopainike.
+Kun profiilikuvaa muutetaan tai se poistetaan, näytetään palautuspainike.
+*/
+const original_img = "{{ form.img.data }}";
+const img = document.querySelector('#img');  
+const fileInput = document.querySelector('input[type=file]')
+const preview = document.querySelector('#preview');
+const poisto = document.querySelector('#poisto');
+const palautus = document.querySelector('#palautus');
+const kuva = "{{ kuva }}"
+palautus.style.display = "none";
+const place = document.querySelector('#location').value;
+
+if (!kuva) {
+    poisto.style.display = "none";
+    }
+
+const previewFile = () => {
+    const file = fileInput.files[0];
+    console.log("file:",file);
+    const reader = new FileReader();
+    reader.onloadend = () => preview.src = reader.result;
+    if (file) {
+        reader.readAsDataURL(file);
+        poisto.style.display = "block";
+        palautus.style.display = "block";
+        } 
+    else {
+        preview.src = "";
+        poisto.style.display = "none";
+        if (kuva) {
+            palautus.style.display = "block";
+            }
+        }
+    }
+
+/*const esikatselu = file => {  
+    preview.src = URL.createObjectURL(file);
+    }
+*/
+
+const poista = () => {
+    preview.src = "{{ url_for('static',filename='default_profile.png') }}";
+    img.value = "";
+    fileInput.value= "";
+    palautus.style.display = kuva ? "block" : "none";
+    poisto.style.display = "none";
+    }    
+
+const palauta = () => {
+    preview.src = "{{ url_for('.img',filename=kuva) }}";
+    img.value = original_img;
+    poisto.style.display = kuva ? "block" : "none";
+    palautus.style.display = "none";
+    fileInput.value= "";
+    }    
+
+const onSubmit = () => {
+    const file = fileInput.files[0];
+    if (file) {
+        img.value = file.name;
+        }
+    }
+
+const updateLocation = () => {
+    const place = document.querySelector('#location').value;
+    const mapContainer = document.querySelector('#map-container');
+    if (mapContainer) {
+        mapContainer.remove();
+        }
+    initMap(place);
+    }
+
+window.initMap = async function(place) {
+     const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
+    var location = { lat: 0, lng: 0 };
+    var geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ 'address': place }, function(results, status) {
+        console.log("status:",status);
+        if (status === 'OK') {
+            location = results[0].geometry.location;
+            var mapContainer = document.createElement('div');
+            mapContainer.id = 'map-container';
+            mapContainer.style.height = '300px';
+            mapContainer.style.width = '100%';
+            document.querySelector('#location').insertAdjacentElement('afterend', mapContainer);
+
+            var map = new google.maps.Map(mapContainer, {
+                zoom: 14,
+                center: location,
+                mapId: "DEMO_MAP_ID", /* Required for AdvancedMarkerElement */
+            });
+            var marker = new google.maps.marker.AdvancedMarkerElement({
+                position: location,
+                map: map
+            });
+        } else {
+            console.error('Geocode was not successful for the following reason: ' + status);
+            }
+        });
+    }
+document.querySelector('#file').onchange = previewFile;
+document.querySelector('form').onsubmit = onSubmit;
+document.querySelector('#location').onchange = updateLocation;
+
+function loadGoogleMapsScript() {
+    return new Promise((resolve, reject) => {
+        if (typeof google !== 'undefined') {
+            resolve();
+            return;
+        }
+    
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key={{ API_KEY }}`;
+    script.async = true;
+    script.defer = true;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+    });
+    }
+    
+loadGoogleMapsScript()
+    .then(() => {
+        // Call initMap only if form.location.data has a valid value
+        if ("{{ form.location.data }}") {
+            initMap("{{ form.location.data }}");
+        }
+    })
+    .catch((error) => console.error("Error loading Google Maps script:", error));  
+
+</script>
+{% endblock %}

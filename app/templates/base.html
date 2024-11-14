@@ -1,62 +1,100 @@
 {% extends "bootstrap/base.html" %}
 
-{% block title %}Flasky{% endblock %}
+{% block title %}Sovellusmalli{% endblock %}
 
 {% block head %}
-{{ super() }}
-<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet"/>
+<link href="{{ url_for('static', filename='site.css') }}" rel="stylesheet">
+<link href="{{ url_for('static', filename='pagination.css') }}" rel="stylesheet">
+<link rel="shortcut icon" href="{{ url_for('static', filename='omniamusta_eitaustaa.png') }}" type="image/x-icon">
+<link rel="icon" href="{{ url_for('static', filename='omniamusta_eitaustaa.png') }}" type="image/x-icon">
+
 {% endblock %}
 
 {% block navbar %}
-<div class="navbar navbar-inverse" role="navigation">
-    <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">Flasky</a>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <img src="{{ url_for('static', filename='omniamusta_eitaustaa.png') }}" alt="Logo" style="height: 30px;">
+        Flask-sovellus
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+          <a class="nav-link{{ ' active' if request.endpoint == 'main.index' }}" href="{{ url_for('main.index') }}">Home</a>
+          {% if current_user.is_authenticated %} 
+          <a class="nav-link{{ ' active' if request.endpoint == 'main.user' }}" href="{{ url_for('main.user', username=current_user.username) }}">Profile</a>
+          <a class="nav-link{{ ' active' if request.endpoint == 'main.user' }}" href="{{ url_for('main.add_recipe') }}">Add Recipe</a>
+          {% endif %} 
+          {% if current_user.is_administrator() %}
+          <a class="nav-link{{ ' active' if request.endpoint == 'main.users' }}" href="{{ url_for('main.users') }}">Users</a>
+          {% endif %} 
         </div>
-        <div class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
-                <li><a href="{{ url_for('main.index') }}">Home</a></li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-                {% if current_user.is_authenticated %}
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Account <b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="{{ url_for('auth.change_password') }}">Change Password</a></li>
-                        <li><a href="{{ url_for('auth.change_email_request') }}">Change Email</a></li>
-                        <li><a href="{{ url_for('auth.logout') }}">Log Out</a></li>
-                    </ul>
-                </li>
-                {% else %}
-                <li><a href="{{ url_for('auth.login') }}">Log In</a></li>
-                {% endif %}
-            </ul>
+        {# ms-auto jälkeen oikeaan reunaan #}
+        <div class="navbar-nav ms-auto">
+          {% if current_user.is_administrator() %} 
+          <a class="nav-link{{ ' active' if request.endpoint == 'auth.faker' }}" href="{{ url_for('auth.faker') }}">New fake users </a>
+          {% endif %} 
+          {% if current_user.is_authenticated %}
+          <a class="nav-link{{ ' active' if request.endpoint == 'auth.change_password' }}" href="{{ url_for('auth.change_password') }}">Change Password</a>
+          <a class="nav-link{{ ' active' if request.endpoint == 'auth.change_email_request' }}" href="{{ url_for('auth.change_email_request') }}">Change Email</a>
+          <a class="nav-link{{ ' active' if request.endpoint == 'auth.logout' }}" href="{{ url_for('auth.logout') }}">Log Out</a>
+          {% else %}
+          <a class="nav-link{{ ' active' if request.endpoint == 'auth.login' }}" href="{{ url_for('auth.login') }}">Log In</a>
+          {% endif %}
         </div>
+      </div>
     </div>
-</div>
+  </nav>
+
 {% endblock %}
 
 {% block content %}
 <div class="container">
-    {% for message in get_flashed_messages() %}
-    <div class="alert alert-warning">
-        <button type="button" class="close" data-dismiss="alert">&times;</button>
+    {% for category,message in get_flashed_messages(with_categories=True) %}
+    {% set category = 'warning' if not category or category == 'message' else category %}
+    <div class="alert alert-{{ category }}">
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         {{ message }}
     </div>
+   
     {% endfor %}
 
     {% block page_content %}{% endblock %}
 </div>
+<footer id="footer">
+<span>&copy; Web-ohjelmointikoulutus, 2024</span>
+</footer>
 {% endblock %}
 
 {% block scripts %}
-{{ super() }}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='scripts.js') }}" async defer></script>
 {{ moment.include_moment() }}
+{{ moment.locale("fi",{
+  relativeTime : {
+      future : '%s päästä',
+      past : '%s sitten',
+      s : 'joitakin sekunteja',
+      m : 'yksi min',
+      mm : '%d min',
+      h : 'yksi t',
+      hh : '%d t',
+      d : 'yksi pv',
+      dd : '%d pv',
+      M : 'kk',
+      MM : '%d kk',
+      y : 'yksi v',
+      yy : '%d v'
+  }
+  })
+}}
+{#
+<script type="text/javascript">
+  moment.locale('{{ moment_locale }}')
+</script>
+#}
 {% endblock %}

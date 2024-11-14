@@ -1,8 +1,11 @@
-from flask import render_template, redirect, current_app, request, url_for, flash
+import sys
+from flask import render_template, redirect, current_app, request, url_for, flash, jsonify
 from flask_login import login_user, logout_user, login_required, \
     current_user
 from . import auth
 from .. import db
+from ..decorators import admin_required
+from ..fake import users as fake_users
 from ..models import User
 from ..email import send_email
 from .forms import LoginForm, RegistrationForm, ChangePasswordForm,\
@@ -14,13 +17,13 @@ def before_request():
     app = current_app._get_current_object()
     app.logger.debug('auth.before_request,endpoint %s', request.endpoint)
     app.logger.debug('auth.before_request,blueprint %s', request.blueprint)
- 
-    if current_user.is_authenticated \
-            and not current_user.confirmed \
+    if current_user.is_authenticated:
+        current_user.ping()   
+        if not current_user.confirmed \
             and request.endpoint \
             and request.blueprint != 'auth' \
             and request.endpoint != 'static':
-        return redirect(url_for('auth.unconfirmed'))
+                return redirect(url_for('auth.unconfirmed'))
 
 
 @auth.route('/unconfirmed')
@@ -34,6 +37,8 @@ def unconfirmed():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
+        print("form.email: "+form.email.data)
+        print("form.password: "+form.password.data)
         user = User.query.filter_by(email=form.email.data.lower()).first()
         if user is not None and user.verify_password(form.password.data):
             login_user(user, form.remember_me.data)
@@ -170,3 +175,45 @@ def change_email(token):
     else:
         flash('Invalid request.')
     return redirect(url_for('main.index'))
+
+@auth.route('/faker')
+@login_required
+@admin_required
+def faker():
+    msg = "Käyttäjien luominen, logger"
+    current_app.logger.info(msg)
+    msg = "Käyttäjien luominen, stderr"
+    sys.stderr.write(msg + '\n')
+    f_users = fake_users(25)
+    if not f_users:
+        msg = "Virhe: käyttäjiä ei luotu"
+        current_app.logger.error(msg)
+    else:
+        msg = "Käyttäjät luotu"
+        current_app.logger.info(msg)
+    # f_users = User.query.all()
+    # print(str(f_users))
+    if not f_users:
+        flash("Virhe: Useita samoja käyttäjätunnuksia","danger")
+    return render_template('auth/fake.html', fake_users=f_users)
+
+ # Esimerkki loggauksen käytöstä Flask-reitillä
+@auth.route('/testi')
+@login_required
+@admin_required
+def testi():
+    # sys.stdout.write("Tämä on testireitti loggerin testaamiseen (stdout).\n")
+    sys.stderr.write("Tämä on testireitti loggerin testaamiseen (stderr).\n")
+    current_app.logger.debug("Tämä on debug-viesti.")
+    current_app.logger.info("Käyttäjä vieraili kotisivulla.")
+    current_app.logger.warning("Tämä on varoitusviesti.")
+    current_app.logger.error("Tämä on virheviesti.")
+    current_app.logger.critical("Tämä on kriittinen virheviesti.")
+    current_app.logger.exception("Tämä on exception-virheviesti.")
+    return "Tervetuloa testisivulle!"
+
+
+
+ 
+     
+  

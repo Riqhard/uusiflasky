@@ -12,13 +12,13 @@ class LoginForm(FlaskForm):
     remember_me = BooleanField('Keep me logged in')
     submit = SubmitField('Log In')
 
-
+# ^[a-zåäöA-ZÅÄÖ '_.\-]+$
 class RegistrationForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired(), Length(1, 64),
+    email = StringField('Email', validators=[DataRequired(), Length(5, 64),
                                              Email()])
     username = StringField('Username', validators=[
         DataRequired(), Length(1, 64),
-        Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0,
+        Regexp(r'^[a-zåäöA-ZÅÄÖ \'_.-]+$', 0,
                'Usernames must have only letters, numbers, dots or '
                'underscores')])
     password = PasswordField('Password', validators=[

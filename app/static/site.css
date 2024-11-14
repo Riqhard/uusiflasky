@@ -1,0 +1,85 @@
+html, body { height: 100%;}
+
+body > footer {
+    position: sticky;
+    top: 100vh;
+  }
+  
+footer {
+    width: 100%;
+    padding: 10px 0;
+    text-align: center;
+    color: #fff;
+    background-color: #04aa6d;
+  }
+  
+.container {
+display: flex;
+flex-direction: column;
+align-content: center;
+margin: 20px auto;
+} 
+
+.btn-close {float:right;}
+
+.profiili-header {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  padding: 10px 20px;
+  justify-content: space-between;
+}
+
+.profiili {
+  display: flex;
+  align-items: flex-start;
+  border: 1px solid #ccc;
+  padding: 10px 2rem;
+}
+
+.button-group-vertical {
+  margin-left: auto;
+  margin-top: 10px;
+  width: 150px;
+}
+
+.button-group-vertical .btn {
+  width: 100%;
+  margin-bottom: 10px;
+  display:block;
+  white-space: nowrap;
+}
+
+.profiilikuva {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: block;
+    border: 1px solid #ccc;
+}
+
+#img {
+  width: col-6;
+  display: block;
+  margin-top: 4px;
+}
+
+.lomake {
+margin: 20px 0;
+}
+
+.painikkeet {
+  display: flex;
+  justify-content: flex-end;
+}
+
+
+.needs-validation .btn {
+margin-top: 10px;
+margin-right: 2rem;
+float: right; 
+}
+
+
+
+  

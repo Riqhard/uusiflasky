@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Luo uusi versio reseptistä{% endblock %}
+
+{% block page_content %}
+<div class="latest-recipes">
+    <h2>Luo uusi versio reseptistä:{{ original_recipe.title }}</h2>
+    <div class="row">
+        <div class="col-md-4 original-recipes_content">
+            <h4>Originaali resepti</h4>
+            <p><strong>Nimi:</strong> {{ original_recipe.title }}</p>
+            <p><strong>Kuvaus:</strong> {{ original_recipe.description }}</p>
+            <p><strong>Ainekset:</strong><br> {{ original_recipe.ingredients.replace(';', '<br>')|safe }}</p>
+            <p><strong>Ohjeet:</strong><br> {{ original_recipe.instructions.replace(';', '<br>')|safe }}</p>
+            {% if original_recipe.img %}
+            <div class="recipe-image">
+                <img src="{{ url_for('main.img', filename=original_recipe.img) }}" alt="{{ original_recipe.title }}">
+            </div>
+            {% endif %}
+        </div>
+        <div class="col-md-8">
+            <h4>Uusi versio</h4>
+            <form method="POST" action="{{ url_for('main.add_recipe_version', id=original_recipe.id) }}" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    {{ form.title.label }}<br>
+                    {{ form.title(size=32, class_="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ form.description.label }}{{ form.description(class_="form-control") }}
+                </div>
+                <div class="form-group">
+                    <div class="form-label">{{ form.ingredients.label }}<br></div>
+                    {{ form.ingredients(class_="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ form.instructions.label }}<br>
+                    {{ form.instructions(class_="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ form.img.label }}<br>
+                    {{ form.img(class_="form-control") }}
+                </div>
+                <div class="form-group_button">
+                    {{ form.submit(class_="btn btn-primary") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -3,6 +3,7 @@
 {% block title %}Flask-sovellus - {{ user.username }}{% endblock %}
 
 {% block page_content %}
+<div class="profiili_muokkaus">
 <div class="page-header">
 <h1>{{ user.username }}</h1>
 </div>
@@ -64,5 +65,14 @@
         {#<a class="btn btn-danger" href="{{ url_for('.edit_profile_admin', id=user.id) }}">Edit Profile [Admin]</a>#}
         {% endif %}
     </p>
+    <div class="ohje_container">
+    <h3>Käyttäjän reseptit:</h3>
+        <ul>
+            {% for recipe in user.recipes %}
+            <li><a href="{{ url_for('main.recipe', id=recipe.id) }}">{{ recipe.title }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
 </div>
 {% endblock %}

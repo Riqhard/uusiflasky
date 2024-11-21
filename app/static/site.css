@@ -1,8 +1,21 @@
-html, body { height: 100%;}
+html, body { 
+  height: 100%;
+  background-color: #7f5538;
+  background-image: url('/static/bg5.png'); /* Käytä suoraa polkua */
+  background-size:contain;
+  background-color: #7f5538;
+  background-position: center;
+  background-repeat:repeat;
+  background-size: 200px;
+}
+a {
+  color: #ff9428;
+}
 
 body > footer {
     position: sticky;
     top: 100vh;
+    
   }
   
 footer {
@@ -10,7 +23,7 @@ footer {
     padding: 10px 0;
     text-align: center;
     color: #fff;
-    background-color: #04aa6d;
+    background-color: #6f4528;
   }
   
 .container {
@@ -80,6 +93,162 @@ margin-right: 2rem;
 float: right; 
 }
 
+.logo-section{
+  display: flex;
+  font-size: large;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+  color: #ffffff;
+
+}
+.navbar-custom{
+  background-color: #7f5538;
+  color: #ffffff;
+}
+.navbar-brand {
+  color: #ffffff;
+}
+.nav-link {
+  color: #ffffff;
+}
+.navbar-nav{
+  color: #ffffff;
+}
+
+.navbar-custom .navbar-brand,
+.navbar-custom .nav-link {
+    color: #ffffff;
+}
+.latest-recipes {
+  background-color: #6f4528;;
+  color: #ffffff;
+  display: flex;
+  flex-wrap: wrap;
+  border: 1px solid #000000;
+  border-radius: 10px;
+  padding: 10px;
+  margin: 10px 0;
+  justify-content: center;
+}
+.form-group {
+  font-size: 24px;
+  background-color: #7f55386b;
+  border: 1px solid #ffffff;
+  border-radius: 3px;
+  margin: 10px;
+}
+.form-group_button{
+  font-size: 24px;
+  margin: 10px;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.add_repice_container{
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  margin: 20px 0;
+  color:#fff;
+  background-color: #7f5538;
+  border: 1px solid #000000;
+  border-radius: 10px;
+
+}
 
 
-  
+
+.latest-recipes_content .row {
+  display: flex;
+  width: 100%;
+}
+
+.latest-recipes_content .col-md-3 {
+  flex: 0 0 25%;
+  max-width: 25%;
+}
+
+.latest-recipes_content .col-md-9 {
+  flex: 0 0 75%;
+  max-width: 75%;
+}
+
+.ohje_container{
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  justify-content: left;
+  padding: 10px;
+  margin: 10px;
+  border: 1px solid #000000;
+  border-radius: 10px;
+  background-size:contain;
+  background-color: #a67654;
+  background-position: center;
+  background-repeat:repeat;
+}
+.latest-recipes_content {
+  background-size:contain;
+  background-color: #7f5538;
+  background-position: center;
+  background-repeat:repeat;
+  color: #ffffff;
+  border: 1px solid #000000;
+  border-radius: 10px;
+  margin: 10px;
+  width: 100%;
+  padding: 10px;
+  background-size: contain;
+  background-color: #7f5538;
+  background-position: center;
+  background-repeat: repeat;
+}
+.latest-recipes_header{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  background-color: #6f4528;
+  color: #ffffff;
+  border: 1px solid #000000;
+  border-radius: 10px;
+  padding: 10px;
+  margin: 10px 0;
+}
+.profiili_muokkaus{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  margin: 20px 0;
+  color: #fff;
+  background-size:contain;
+  background-color: #7f5538;
+  background-position: center;
+  background-repeat:repeat;
+}
+.recipe-image{
+  padding: 10px;
+  margin: 10px 0;
+}
+.recipe-image img{
+  max-height: 100%;
+  max-width: 300px;
+  border: 1px solid #000000;
+  border-radius: 10px;
+
+}
+.original-recipes_content{
+  color: #fff;
+  background-size:contain;
+  background-color: #7f5538;
+  background-position: center;
+  background-repeat:repeat;
+  border: 1px solid #ffffff;
+  border-radius: 10px;
+}

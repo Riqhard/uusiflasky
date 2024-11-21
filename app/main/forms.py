@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import BooleanField, FileField, StringField, SubmitField, HiddenField, SelectField, DateTimeLocalField, TextAreaField
 from wtforms.validators import DataRequired, Length, Email, Regexp, Optional
-from wtforms import ValidationError
+from wtforms import ValidationError, FieldList, FormField
 from flask_wtf.file import FileAllowed
 from app.models import User
 from flask_login import current_user
@@ -79,9 +79,21 @@ class ProfileFormAdmin(FlaskForm):
     active = BooleanField('Active')
     submit = SubmitField('Save profile')    
 
-class LatestRepicesForm(FlaskForm):
-    title = StringField('Title', validators=[DataRequired()])
-    instructions = TextAreaField('Instructions', validators=[DataRequired()])
-    ingredients = TextAreaField('Ingredients', validators=[DataRequired()])
-    submit = SubmitField('Add Recipe')
-    
+class IngredientForm(FlaskForm):
+    name = StringField('Ingredient Name', validators=[DataRequired()])
+    amount = StringField('Amount', validators=[DataRequired()])
+
+class InstructionForm(FlaskForm):
+    step = StringField('Step Number', validators=[DataRequired()])
+    description = TextAreaField('Description', validators=[DataRequired()])
+
+class RecipeForm(FlaskForm):
+    title = StringField('Nimi', validators=[DataRequired()])
+    description = TextAreaField('Kuvaus', validators=[DataRequired()])  # New field for description
+    ingredients = TextAreaField('Ainekset (Käytä formaattia: "Ainesosa: määrä ; Ainesosa: määrä ;")', validators=[DataRequired()])
+    instructions = TextAreaField('Ohjeet (Käytä formaattia: "Ohje1 ; Ohje2 ;")', validators=[DataRequired()])
+    img = FileField('Kuva', validators=[FileAllowed(['png', 'jpg', 'jpeg', 'gif'], 'Images only!')])
+    submit = SubmitField('Lisää resepti')
+
+
+

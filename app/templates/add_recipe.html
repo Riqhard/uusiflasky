@@ -3,23 +3,32 @@
 {% block title %}Add Recipe{% endblock %}
 
 {% block page_content %}
-<div class="container">
-    <h2>Add a New Recipe</h2>
-    <form method="POST" action="{{ url_for('main.add_recipe') }}">
+
+<div class="add_repice_container">
+    <h2>Lisää uusi Resepti</h2>
+    <form method="POST" action="{{ url_for('main.add_recipe') }}" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
         <div class="form-group">
             {{ form.title.label }}<br>
             {{ form.title(size=32, class_="form-control") }}
         </div>
         <div class="form-group">
+            {{ form.description.label }}<br>
+            {{ form.description(class_="form-control") }}
+        </div>
+        <div class="form-group">
+            <div class="form-label">{{ form.ingredients.label }}<br></div>
+            {{ form.ingredients(class_="form-control") }}
+        </div>
+        <div class="form-group">
             {{ form.instructions.label }}<br>
-            {{ form.instructions(rows=5, class_="form-control") }}
+            {{ form.instructions(class_="form-control") }}
         </div>
         <div class="form-group">
-            {{ form.ingredients.label }}<br>
-            {{ form.ingredients(rows=5, class_="form-control") }}
+            {{ form.img.label }}<br>
+            {{ form.img(class_="form-control") }}
         </div>
-        <div class="form-group">
+        <div class="form-group_button">
             {{ form.submit(class_="btn btn-primary") }}
         </div>
     </form>

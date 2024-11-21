@@ -1,14 +1,13 @@
-from flask import render_template,request,flash,redirect,url_for,jsonify,current_app,send_from_directory
+from flask import render_template, request, flash, redirect, url_for, jsonify, current_app, send_from_directory
 from flask_login import login_required,current_user
 from ..decorators import admin_required,debuggeri
-from ..models import User,LatestRecipe
-from .forms import ProfileForm,ProfileFormAdmin,LatestRepicesForm
+from ..models import User,  Ingredient, Instruction, Recipe
+from .forms import ProfileForm,ProfileFormAdmin,RecipeForm
 from app import db
 from . import main
 from sqlalchemy import text
 import os
 from werkzeug.utils import secure_filename
-from app.models import LatestRecipe
 
 @debuggeri
 def shorten(filename):
@@ -43,7 +42,10 @@ def poista_vanha_kuva(id,kuva):
 
 @main.route('/')
 def index():
-    return render_template('index.html')
+    latest_recipes = Recipe.query.order_by(Recipe.created_at.desc()).limit(5).all()
+    for recipe in latest_recipes:
+        recipe.user = User.query.get(recipe.user_id)
+    return render_template('index.html', latest_recipes=latest_recipes)
 
 @main.route('/img/')
 @main.route('/img/<path:filename>')
@@ -191,24 +193,72 @@ def poista():
 
 
 
-@main.route('/latest_recipes', methods=['GET'])
-def latest_recipes():
-    latest_recipes = LatestRecipe.query.order_by(LatestRecipe.date.desc()).limit(5)
-    return render_template('latest_recipes.html',latest_recipes=latest_recipes)
-
 
 @main.route('/add_recipe', methods=['GET', 'POST'])
 @login_required
 def add_recipe():
-    form = LatestRepicesForm()
+    form = RecipeForm()
     if form.validate_on_submit():
-        recipe = LatestRecipe(
+        img_filename = None
+        if form.img.data:
+            img_filename = secure_filename(form.img.data.filename)
+            img_filename = shorten(img_filename)
+            img_path = os.path.join(current_app.config['KUVAPOLKU'], img_filename)
+            form.img.data.save(img_path)
+        recipe = Recipe(
             title=form.title.data,
+            description=form.description.data,  # Include description
+            ingredients=form.ingredients.data,
             instructions=form.instructions.data,
-            ingredients=form.ingredients.data
+            user_id=current_user.id,
+            img=img_filename,
+            version=1,  # Initial version
+            original_id=None  # original version ID
         )
         db.session.add(recipe)
         db.session.commit()
-        flash('Uusi resepti on lisätty.', 'success')
-        return redirect(url_for('.latest_recipes'))
+        flash('Uusi resepti lisätty.', 'success')
+        return redirect(url_for('main.index'))
     return render_template('add_recipe.html', form=form)
+
+@main.route('/add_recipe_version/<int:id>', methods=['GET', 'POST'])
+@login_required
+def add_recipe_version(id):
+    original_recipe = Recipe.query.get_or_404(id)
+    form = RecipeForm()
+    if form.validate_on_submit():
+        img_filename = None
+        if form.img.data:
+            img_filename = secure_filename(form.img.data.filename)
+            img_filename = shorten(img_filename)
+            img_path = os.path.join(current_app.config['KUVAPOLKU'], img_filename)
+            form.img.data.save(img_path)
+        new_version = original_recipe.create_new_version(
+            title=form.title.data,
+            ingredients=form.ingredients.data,
+            instructions=form.instructions.data,
+            img=img_filename,
+            description=form.description.data  # Include description in new version
+        )
+        flash('Uusi versio luotu.', 'success')
+        return redirect(url_for('main.recipe', id=new_version.id))
+    return render_template('add_recipe_version.html', form=form, original_recipe=original_recipe)
+
+@main.route('/recipe/<int:id>', methods=['GET'])
+def recipe(id):
+    recipe = Recipe.query.get_or_404(id)
+    recipe.user = User.query.get(recipe.user_id)
+    return render_template('recipe.html', recipe=recipe)
+
+@main.route('/delete_recipe/<int:id>', methods=['POST'])
+@login_required
+def delete_recipe(id):
+    recipe = Recipe.query.get_or_404(id)
+    if recipe.user_id != current_user.id and not current_user.is_administrator():
+        flash('Sinulla ei ole oikeutta poistaa tätä reseptiä.', 'danger')
+        return redirect(url_for('main.index'))
+    db.session.delete(recipe)
+    db.session.commit()
+    flash('Resepti poistettu.', 'success')
+    return redirect(url_for('main.index'))
+

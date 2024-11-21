@@ -190,15 +190,55 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-class LatestRecipe(db.Model):
-    __tablename__ = 'latest_recipes'
+
+class Recipe(db.Model):
+    __tablename__ = 'recipes'
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(128), nullable=False)
-    instructions = db.Column(db.Text, nullable=False)
-    ingredients = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    user = db.relationship('User', backref='latest_recipes')
+    user = db.relationship('User', backref='recipes')
+    ingredients = db.Column(db.Text, nullable=False)
+    instructions = db.Column(db.Text, nullable=False)
+    img = db.Column(db.String(64))  # New column for image filename
+    version = db.Column(db.Integer, nullable=False, default=1)  # New column for version
+    original_id = db.Column(db.Integer, db.ForeignKey('recipes.id'), nullable=True)  # New column for original recipe id
+    description = db.Column(db.Text, nullable=False)  # New column for description
+
+    def create_new_version(self, title, ingredients, instructions, img=None):
+        new_version = Recipe(
+            title=title,
+            ingredients=ingredients,
+            instructions=instructions,
+            user_id=self.user_id,
+            img=img,
+            version=self.version + 1,
+            original_id=self.original_id or self.id,
+            description=self.description  # Include description in new version
+        )
+        db.session.add(new_version)
+        db.session.commit()
+        return new_version
 
     def __repr__(self):
-        return f'<LatestRecipe {self.title}>'
+        return f'<Recipe {self.title}>'
+    
+class Ingredient(db.Model):
+    __tablename__ = 'ingredients'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True)
+    amount = db.Column(db.String(64), nullable=False, index=True)
+    recipe_id = db.Column(db.Integer, db.ForeignKey('recipes.id'))
+
+    def __repr__(self):
+        return f'<Ingredient {self.name}>'
+    
+class Instruction(db.Model):
+    __tablename__ = 'instructions'
+    id = db.Column(db.Integer, primary_key=True)
+    step = db.Column(db.Integer, nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    recipe_id = db.Column(db.Integer, db.ForeignKey('recipes.id'))
+
+    def __repr__(self):
+        return f'<Ingredient {self.name}>'

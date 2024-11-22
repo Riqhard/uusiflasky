@@ -252,3 +252,21 @@ float: right;
   border: 1px solid #ffffff;
   border-radius: 10px;
 }
+.full-container{
+  display: flex;
+  flex-direction: row;
+  color: #fff;
+  background-size:contain;
+  background-color: #573b28;
+  background-position: center;
+  background-repeat:repeat;
+  border: 1px solid #d3d3d3;
+  border-radius: 10px;
+  padding: 5px;
+}
+.ingredients-container{
+  width: 50%;
+}
+.instructions-container{
+  width: 50%;
+}

@@ -205,7 +205,7 @@ class Recipe(db.Model):
     original_id = db.Column(db.Integer, db.ForeignKey('recipes.id'), nullable=True)  # New column for original recipe id
     description = db.Column(db.Text, nullable=False)  # New column for description
 
-    def create_new_version(self, title, ingredients, instructions, img=None):
+    def create_new_version(self, title, ingredients, instructions, img=None, description=None):
         new_version = Recipe(
             title=title,
             ingredients=ingredients,
@@ -214,7 +214,7 @@ class Recipe(db.Model):
             img=img,
             version=self.version + 1,
             original_id=self.original_id or self.id,
-            description=self.description  # Include description in new version
+            description=description 
         )
         db.session.add(new_version)
         db.session.commit()

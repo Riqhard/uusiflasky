@@ -5,31 +5,44 @@
 {% block page_content %}
     <div class="latest-recipes_content">
         <div class="row">
-            <div class="recipe_title col-md-3">
+            <div class="recipe_title col-md-9">
             <h2>{{ recipe.title }}</h2>
             <p><strong>Tekijä:</strong> {{ recipe.user.username }}</p>
             <p><strong>Luotu:</strong> {{ recipe.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
             <p><strong>Kuvaus:</strong> {{ recipe.description }}</p>
             </div>
 
-            <div class="recipe_versions ms-auto col-md-3">
-                <h4>Versiot:</h4>
-                <select onchange="location = this.value;">
-                    {% for version in recipe.versions %}
-                    <option value="{{ url_for('main.recipe', id=version.id) }}">{{ version.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</option>
-                    {% else %}
-                    <option disabled>Ei versioita</option>
-                    {% endfor %}
-                </select>
+            {% if recipe.img %}
+            <div class="recipe-image col-md-3">
+                <img src="{{ url_for('main.img', filename=recipe.img) }}" alt="{{ recipe.title }}">
             </div>
+            {% endif %}
+
+        </div>
+        <div class="recipe_versions ms-auto col-md-3">
+            <h4>Versiot:</h4>
+            <select onchange="location = this.value;">
+                <option value="{{ url_for('main.recipe', id=recipe.id) }}">{{ recipe.title }}</option>
+                {% for version in recipe.all_versions %}
+                {% if recipe.original_id %}
+                <option value="{{ url_for('main.recipe', id=recipe.original_id) }}">{{ recipe.original.title }}</option>
+                {% endif %}
+                {% if version.id != recipe.id %}
+                <option value="{{ url_for('main.recipe', id=version.id) }}">{{ version.title }}</option>
+                {% endif %}
+                {% endfor %}
+            </select>
+
+            {% if current_user.is_authenticated %}
+            <form action="{{ url_for('main.add_recipe_version', id=recipe.original_id or recipe.id) }}" method="get" style="display:inline;">
+                <button type="submit" class="btn btn-primary">Luo uusi versio</button>
+            </form>
+            {% endif %}
+
+
         </div>
 
 
-        {% if recipe.img %}
-        <div class="recipe-image">
-            <img src="{{ url_for('main.img', filename=recipe.img) }}" alt="{{ recipe.title }}">
-        </div>
-        {% endif %}
         <div class="ohje_container">
             <h4>Ainesosat:</h4>
             <p>{{ recipe.ingredients.replace(';', '<br>')|safe }}</p>
@@ -38,16 +51,17 @@
             <h4>Ohje:</h4>
             <p>{{ recipe.instructions.replace(';', '<br>')|safe }}</p>
         </div>
+
+
+
+
+        {% if current_user.is_administrator() %}
+        <form action="{{ url_for('main.delete_recipe', id=recipe.id) }}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-danger">Poista</button>
+        </form>
+        {% endif %} 
     </div>
-    {% if current_user.is_authenticated %}
-    <form action="{{ url_for('main.add_recipe_version', id=recipe.id) }}" method="get" style="display:inline;">
-        <button type="submit" class="btn btn-primary">Luo uusi versio</button>
-    </form>
-    {% endif %}
-    {% if current_user.is_administrator() %}
-    <form action="{{ url_for('main.delete_recipe', id=recipe.id) }}" method="post" style="display:inline;">
-        <button type="submit" class="btn btn-danger">Poista</button>
-    </form>
-    {% endif %} 
+
+
 
 {% endblock %}

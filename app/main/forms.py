@@ -90,10 +90,11 @@ class InstructionForm(FlaskForm):
 class RecipeForm(FlaskForm):
     title = StringField('Nimi', validators=[DataRequired()])
     description = TextAreaField('Kuvaus', validators=[DataRequired()])  # New field for description
-    ingredients = TextAreaField('Ainekset (Käytä formaattia: "Ainesosa: määrä ; Ainesosa: määrä ;")', validators=[DataRequired()])
-    instructions = TextAreaField('Ohjeet (Käytä formaattia: "Ohje1 ; Ohje2 ;")', validators=[DataRequired()])
     img = FileField('Kuva', validators=[FileAllowed(['png', 'jpg', 'jpeg', 'gif'], 'Images only!')])
     submit = SubmitField('Lisää resepti')
+    for i in range(50):
+        locals()[f'ingredient_{i}'] = StringField(f'Ainesosa {i+1}')
+        locals()[f'instruction_{i}'] = TextAreaField(f'Ohje {i+1}')
 
 
 

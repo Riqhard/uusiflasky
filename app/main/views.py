@@ -205,15 +205,29 @@ def add_recipe():
             img_filename = shorten(img_filename)
             img_path = os.path.join(current_app.config['KUVAPOLKU'], img_filename)
             form.img.data.save(img_path)
+        ingredients = []
+        for i in range(50):
+            ingredient_field = getattr(form, f'ingredient_{i}')
+            if ingredient_field.data:
+                ingredients.append(ingredient_field.data)
+        ingredients_str = '; '.join(ingredients)
+        
+        instructions = []
+        for i in range(50):
+            instruction_field = getattr(form, f'instruction_{i}')
+            if instruction_field.data:
+                instructions.append(instruction_field.data)
+        instructions_str = '; '.join(instructions)
+        
         recipe = Recipe(
             title=form.title.data,
-            description=form.description.data,  # Include description
-            ingredients=form.ingredients.data,
-            instructions=form.instructions.data,
+            description=form.description.data,
+            ingredients=ingredients_str,
+            instructions=instructions_str,
             user_id=current_user.id,
             img=img_filename,
-            version=1,  # Initial version
-            original_id=None  # original version ID
+            version=1,
+            original_id=None
         )
         db.session.add(recipe)
         db.session.commit()
@@ -248,6 +262,9 @@ def add_recipe_version(id):
 def recipe(id):
     recipe = Recipe.query.get_or_404(id)
     recipe.user = User.query.get(recipe.user_id)
+    recipe.all_versions = Recipe.query.filter_by(original_id=recipe.original_id or recipe.id).all()
+    if recipe.original_id:
+        recipe.original = Recipe.query.get(recipe.original_id)
     return render_template('recipe.html', recipe=recipe)
 
 @main.route('/delete_recipe/<int:id>', methods=['POST'])

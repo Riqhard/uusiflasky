@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% import "auth/wtf.html" as wtf %}
+
+{% block title %}Sovellusmalli - Käyttäjätiedot{% endblock %}
+
+{% block page_content %}
+<div class="profiili_muokkaus">
+<h2>Käyttäjätiedot</h2>
+<div class="profiili-header col-md-10 col-lg-8">
+{% if kuva %}
+<img src="{{ url_for('main.img',filename=kuva) }}" class="profiilikuva">    
+{% endif %}
+<div id="map" style="height: 100px; width: 70%; display:none;"></div>
+</div>
+</div>
+<script>
+    async function initMap() {
+        const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
+        var location = { lat: 0, lng: 0 };
+        var geocoder = new google.maps.Geocoder();
+        geocoder.geocode({ 'address': '{{ user.location }}' }, function(results, status) {
+            if (status === 'OK') {
+                location = results[0].geometry.location;
+                var map = new google.maps.Map(document.getElementById('map'), {
+                    zoom: 14,
+                    center: location,
+                    mapId: "DEMO_MAP_ID", /* Required for AdvancedMarkerElement */
+                });
+                var marker = new google.maps.marker.AdvancedMarkerElement({
+                    position: location,
+                    map: map
+                });
+                document.querySelector('#map').style.display = 'block';
+                } 
+            else {
+                console.error('Geocode was not successful for the following reason: ' + status);
+            }
+        });
+    }
+</script>
+<script async defer
+src="https://maps.googleapis.com/maps/api/js?key={{ API_KEY }}&loading=async&callback=initMap&libraries=marker">
+</script>
+<div class="profiili_muokkaus">
+<div class="lomake col-md-10 col-lg-8">
+{{ wtf.quick_form(form,novalidate=True,extra_classes='needs-validation') }}
+</div>
+</div>
+{% endblock %}

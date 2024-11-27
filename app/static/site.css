@@ -11,6 +11,15 @@ html, body {
 a {
   color: #ff9428;
 }
+.users{
+  border: 1px solid #000000;
+  border-radius: 10px;
+  color: #000000;
+  background-size:contain;
+  background-color: #aa7550;
+  background-position: center;
+  background-repeat:repeat;
+}
 
 body > footer {
     position: sticky;
@@ -119,6 +128,19 @@ float: right;
 .navbar-custom .navbar-brand,
 .navbar-custom .nav-link {
     color: #ffffff;
+}
+
+.introduction{
+  text-align: center;
+  padding: 10px;
+  margin: 20px 0;
+  color: #fff;
+  border: 1px solid #000000;
+  border-radius: 10px;
+  background-size:contain;
+  background-color: #7f5538;
+  background-position: center;
+  background-repeat:repeat;
 }
 .latest-recipes {
   background-color: #6f4528;;
@@ -263,6 +285,7 @@ float: right;
   border: 1px solid #d3d3d3;
   border-radius: 10px;
   padding: 5px;
+  margin: 3px;
 }
 .ingredients-container{
   width: 50%;
@@ -270,3 +293,28 @@ float: right;
 .instructions-container{
   width: 50%;
 }
+.instructions-container-boxed{
+  color: #fff;
+  background-size:contain;
+  background-color: #7f5538;
+  background-position: center;
+  background-repeat:repeat;
+  border: 1px solid #ffffff;
+  border-radius: 10px;
+  padding: 10px;
+  margin: 3px;
+  width: 70%;
+}
+.ingredients-container-boxed{
+  color: #fff;
+  background-size:contain;
+  background-color: #7f5538;
+  background-position: center;
+  background-repeat:repeat;
+  border: 1px solid #ffffff;
+  border-radius: 10px;
+  padding: 10px;
+  margin: 3px;
+  width: 30%;
+}
+

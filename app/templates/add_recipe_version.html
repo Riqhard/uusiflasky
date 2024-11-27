@@ -20,23 +20,57 @@
         </div>
         <div class="col-md-8">
             <h4>Uusi versio</h4>
-            <form method="POST" action="{{ url_for('main.add_recipe_version', id=original_recipe.id) }}" enctype="multipart/form-data">
+            <form id="recipeForm" method="POST" action="{{ url_for('main.add_recipe_version', id=original_recipe.id) }}" enctype="multipart/form-data">
                 {{ form.hidden_tag() }}
                 <div class="form-group">
                     {{ form.title.label }}<br>
-                    {{ form.title(size=32, class_="form-control") }}
+                    {{ form.title(size=32, class_="form-control", value=original_recipe.title) }}
                 </div>
                 <div class="form-group">
-                    {{ form.description.label }}{{ form.description(class_="form-control") }}
+                    {{ form.description.label }}<br>
+                    {{ form.description(class_="form-control", value=original_recipe.description) }}
                 </div>
-                <div class="form-group">
-                    <div class="form-label">{{ form.ingredients.label }}<br></div>
-                    {{ form.ingredients(class_="form-control") }}
+
+                <div class="full-container">
+                    <div class="ingredients-container">
+                        <div class="form-group">
+                            <label for="ingredientCount">Valitse ainesosien määrä:</label>
+                            <select id="ingredientCount" class="form-control">
+                                {% for i in range(1, 51) %}
+                                <option value="{{ i }}">{{ i }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div id="ingredientFields">
+                            {% for i in range(50) %}
+                            <div class="form-group ingredient-field" style="display: none;">
+                                {{ form['ingredient_' + i|string].label }}<br>
+                                {{ form['ingredient_' + i|string](class_="form-control", value=original_recipe.ingredients.split(';')[i] if i < original_recipe.ingredients.split(';')|length else '') }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="instructions-container">
+                        <div class="form-group">
+                            <label for="instructionCount">Valitse ohjeiden määrä:</label>
+                            <select id="instructionCount" class="form-control">
+                                {% for i in range(1, 51) %}
+                                <option value="{{ i }}">{{ i }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div id="instructionFields">
+                            {% for i in range(50) %}
+                            <div class="form-group instruction-field" style="display: none;">
+                                {{ form['instruction_' + i|string].label }}<br>
+                                {{ form['instruction_' + i|string](class_="form-control", value=original_recipe.instructions.split(';')[i] if i < original_recipe.instructions.split(';')|length else '') }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    {{ form.instructions.label }}<br>
-                    {{ form.instructions(class_="form-control") }}
-                </div>
+
                 <div class="form-group">
                     {{ form.img.label }}<br>
                     {{ form.img(class_="form-control") }}
@@ -48,4 +82,41 @@
         </div>
     </div>
 </div>
+
+<script>
+document.getElementById('ingredientCount').addEventListener('change', function(event) {
+    let count = parseInt(event.target.value);
+    document.querySelectorAll('.ingredient-field').forEach((field, index) => {
+        field.style.display = index < count ? 'block' : 'none';
+    });
+});
+
+document.getElementById('instructionCount').addEventListener('change', function(event) {
+    let count = parseInt(event.target.value);
+    document.querySelectorAll('.instruction-field').forEach((field, index) => {
+        field.style.display = index < count ? 'block' : 'none';
+    });
+});
+
+document.getElementById('recipeForm').addEventListener('submit', function(event) {
+    let ingredients = [];
+    for (let i = 0; i < 50; i++) {
+        let ingredientField = document.getElementById('ingredient_' + i);
+        if (ingredientField && ingredientField.value) {
+            ingredients.push(ingredientField.value);
+        }
+    }
+    document.getElementById('ingredients').value = ingredients.join('; ');
+
+    let instructions = [];
+    for (let i = 0; i < 50; i++) {
+        let instructionField = document.getElementById('instruction_' + i);
+        if (instructionField && instructionField.value) {
+            instructions.push(instructionField.value);
+        }
+    }
+    document.getElementById('instructions').value = instructions.join('; ');
+});
+</script>
+
 {% endblock %}

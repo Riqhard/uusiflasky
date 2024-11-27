@@ -239,7 +239,7 @@ def add_recipe():
 @login_required
 def add_recipe_version(id):
     original_recipe = Recipe.query.get_or_404(id)
-    form = RecipeForm()
+    form = RecipeForm(obj=original_recipe)
     if form.validate_on_submit():
         img_filename = None
         if form.img.data:
@@ -247,10 +247,25 @@ def add_recipe_version(id):
             img_filename = shorten(img_filename)
             img_path = os.path.join(current_app.config['KUVAPOLKU'], img_filename)
             form.img.data.save(img_path)
+        
+        ingredients = []
+        for i in range(50):
+            ingredient_field = getattr(form, f'ingredient_{i}')
+            if ingredient_field.data:
+                ingredients.append(ingredient_field.data)
+        ingredients_str = '; '.join(ingredients)
+        
+        instructions = []
+        for i in range(50):
+            instruction_field = getattr(form, f'instruction_{i}')
+            if instruction_field.data:
+                instructions.append(instruction_field.data)
+        instructions_str = '; '.join(instructions)
+        
         new_version = original_recipe.create_new_version(
             title=form.title.data,
-            ingredients=form.ingredients.data,
-            instructions=form.instructions.data,
+            ingredients=ingredients_str,
+            instructions=instructions_str,
             img=img_filename,
             description=form.description.data  # Include description in new version
         )
@@ -267,15 +282,69 @@ def recipe(id):
         recipe.original = Recipe.query.get(recipe.original_id)
     return render_template('recipe.html', recipe=recipe)
 
+
+@main.route('/poista_recipe', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def poista_recipe():
+    recipe = Recipe.query.get(request.form.get('id'))
+    if recipe is not None:
+        db.session.delete(recipe)
+        db.session.commit()
+        flash(f"Resepti {recipe.title} on poistettu")
+        return jsonify(OK="Resepti on poistettu.")
+    else:
+        return jsonify(virhe="Resepti' ei löydy.")
+
 @main.route('/delete_recipe/<int:id>', methods=['POST'])
 @login_required
+@admin_required
 def delete_recipe(id):
     recipe = Recipe.query.get_or_404(id)
     if recipe.user_id != current_user.id and not current_user.is_administrator():
         flash('Sinulla ei ole oikeutta poistaa tätä reseptiä.', 'danger')
         return redirect(url_for('main.index'))
-    db.session.delete(recipe)
-    db.session.commit()
-    flash('Resepti poistettu.', 'success')
+    
+    # Check if the recipe is an original or a version
+    if recipe.original_id is not None:
+        # It's a version, just delete it
+        db.session.delete(recipe)
+        db.session.commit()
+        flash('Reseptiversio poistettu.', 'success')
+    else:
+        # It's an original, delete all versions first
+        versions = Recipe.query.filter_by(original_id=recipe.id).all()
+        for version in versions:
+            db.session.delete(version)
+        db.session.delete(recipe)
+        db.session.commit()
+        flash('Resepti ja kaikki sen versiot poistettu.', 'success')
+    
     return redirect(url_for('main.index'))
+
+@main.route('/load_more_recipes', methods=['GET'])
+def load_more_recipes():
+    offset = request.args.get('offset', 0, type=int)
+    limit = 5
+    more_recipes = Recipe.query.order_by(Recipe.created_at.desc()).offset(offset).limit(limit).all()
+    for recipe in more_recipes:
+        recipe.user = User.query.get(recipe.user_id)
+    return jsonify(recipes=[{
+        'id': recipe.id,
+        'title': recipe.title,
+        'user': recipe.user.username,
+        'img': recipe.img,
+        'ingredients': recipe.ingredients,
+        'instructions': recipe.instructions
+    } for recipe in more_recipes])
+
+@main.route('/search_recipes', methods=['GET'])
+def search_recipes():
+    query = request.args.get('query', '')
+    if query:
+        search = f"%{query}%"
+        recipes = Recipe.query.filter(Recipe.title.ilike(search)).all()
+    else:
+        recipes = []
+    return render_template('search_results.html', query=query, recipes=recipes)
 

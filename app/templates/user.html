@@ -66,7 +66,7 @@
         {% endif %}
     </p>
     <div class="ohje_container">
-    <h3>Käyttäjän reseptit:</h3>
+    <h3>Käyttäjän luomat reseptit:</h3>
         <ul>
             {% for recipe in user.recipes %}
             <li><a href="{{ url_for('main.recipe', id=recipe.id) }}">{{ recipe.title }}</a></li>

@@ -4,10 +4,11 @@
 {% block title %}Sovellusmalli - Profiili{% endblock %}
 
 {% block page_content %}
-<div class="page-header">
-<h1>Omat tiedot</h1>
-</div>
 <div class="profiili_muokkaus">
+    <div class="page-header">
+    <h1>Omat tiedot</h1>
+    </div>
+
     <div class="lomake col-md-10 col-lg-8">
     {{ wtf.quick_form(form,novalidate=True,extra_classes='needs-validation') }}
     </div>

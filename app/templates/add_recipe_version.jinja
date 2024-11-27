@@ -55,16 +55,16 @@
                         <div class="form-group">
                             <label for="instructionCount">Valitse ohjeiden määrä:</label>
                             <select id="instructionCount" class="form-control">
-                                {% for i in range(1, 51) %}
-                                <option value="{{ i }}">{{ i }}</option>
+                                {% for a in range(1, 51) %}
+                                <option value="{{ a }}">{{ a }}</option>
                                 {% endfor %}
                             </select>
                         </div>
                         <div id="instructionFields">
-                            {% for i in range(50) %}
+                            {% for a in range(50) %}
                             <div class="form-group instruction-field" style="display: none;">
-                                {{ form['instruction_' + i|string].label }}<br>
-                                {{ form['instruction_' + i|string](class_="form-control", value=original_recipe.instructions.split(';')[i] if i < original_recipe.instructions.split(';')|length else '') }}
+                                {{ form['instruction_' + a|string].label }}<br>
+                                {{ form['instruction_' + a|string](class_="form-control", id='instruction_' + a|string, value=original_recipe.instructions.split(';')[a] if a < original_recipe.instructions.split(';')|length else '') }}
                             </div>
                             {% endfor %}
                         </div>
@@ -95,6 +95,30 @@ document.getElementById('instructionCount').addEventListener('change', function(
     let count = parseInt(event.target.value);
     document.querySelectorAll('.instruction-field').forEach((field, index) => {
         field.style.display = index < count ? 'block' : 'none';
+    });
+});
+
+// Display the correct number of fields based on the original recipe's ingredients and instructions
+window.addEventListener('load', function() {
+    let initialIngredientCount = {{ original_recipe.ingredients.split(';')|length }};
+    document.getElementById('ingredientCount').value = initialIngredientCount;
+    document.querySelectorAll('.ingredient-field').forEach((field, index) => {
+        field.style.display = index < initialIngredientCount ? 'block' : 'none';
+    });
+
+    let initialInstructionCount = {{ original_recipe.instructions.split(';')|length }};
+    document.getElementById('instructionCount').value = initialInstructionCount;
+    document.querySelectorAll('.instruction-field').forEach((field, index) => {
+        field.style.display = index < initialInstructionCount ? 'block' : 'none';
+    });
+
+    // Populate the instruction fields with the original recipe's instructions
+    let originalInstructions = {{ original_recipe.instructions.split(';')|tojson }};
+    originalInstructions.forEach((instruction, index) => {
+        let instructionField = document.getElementById('instruction_' + index);
+        if (instructionField) {
+            instructionField.value = instruction;
+        }
     });
 });
 

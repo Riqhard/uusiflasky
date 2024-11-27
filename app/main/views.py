@@ -271,7 +271,7 @@ def add_recipe_version(id):
         )
         flash('Uusi versio luotu.', 'success')
         return redirect(url_for('main.recipe', id=new_version.id))
-    return render_template('add_recipe_version.html', form=form, original_recipe=original_recipe)
+    return render_template('add_recipe_version.jinja', form=form, original_recipe=original_recipe)
 
 @main.route('/recipe/<int:id>', methods=['GET'])
 def recipe(id):
@@ -281,7 +281,6 @@ def recipe(id):
     if recipe.original_id:
         recipe.original = Recipe.query.get(recipe.original_id)
     return render_template('recipe.html', recipe=recipe)
-
 
 @main.route('/poista_recipe', methods=['GET', 'POST'])
 @login_required

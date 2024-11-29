@@ -7,7 +7,9 @@
         <div class="row">
             <div class="recipe_title col-md-9">
             <h2>{{ recipe.title }}</h2>
+            {% if not recipe.original_id %}
             <p><strong>Tekijä:</strong> {{ recipe.user.username }}</p>
+            {% endif %}
             <p><strong>Luotu:</strong> {{ recipe.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
             <p><strong>Kuvaus:</strong> {{ recipe.description }}</p>
             </div>
@@ -53,9 +55,11 @@
             </div>
         </div>
 
+        {% if current_user.id == recipe.user_id %}
+        <a href="{{ url_for('main.edit_recipe', id=recipe.id) }}" class="btn btn-warning">Muokkaa</a>
+        {% endif %}
 
-        {% if current_user.is_administrator() %}
-
+        {% if current_user.id == recipe.user_id or current_user.is_administrator() %}
         <button class="btn btn-danger delete-btn" data-id="{{ recipe.id }}">Poista Resepti</button>
         {% endif %} 
     </div>

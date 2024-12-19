@@ -65,8 +65,29 @@
 
     {% block page_content %}{% endblock %}
 </div>
-<footer id="footer">
-<span>&copy; Web-ohjelmointikoulutus, 2024</span>
+<footer id="footer" class="bg-dark text-white mt-4">
+  <div class="container py-2">
+    <div class="row">
+      <div class="col-md-4">
+        <p>Parhaat reseptit suvusta sukuun.</p>
+      </div>
+      <div class="col-md-4">
+        <h5>Linkit</h5>
+        <ul class="list-unstyled">
+          <li><a href="{{ url_for('main.index') }}" class="text-white">Koti</a></li>
+          <li><a href="{{ url_for('main.add_recipe') }}" class="text-white">Uusi Resepti</a></li>
+          <li><a href="{{ url_for('main.users') }}" class="text-white">Käyttäjät</a></li>
+        </ul>
+      </div>
+      <div class="col-md-4">
+        <h5>Ota yhteyttä</h5>
+        <ul class="list-unstyled">
+          <li><a href="mailto:info@sukureseptit.fi" class="text-white">info@sukureseptit.fi</a></li>
+          <li><a href="tel:+358123456789" class="text-white">+358 123 456 789</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
 </footer>
 {% endblock %}
 
